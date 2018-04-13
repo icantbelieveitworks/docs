@@ -55,9 +55,9 @@ certbot certonly --webroot -w /var/www/html -d xakep1.anilibria.tv -m admin@anil
 # /etc/init.d/cron restart
 ```
 
-Скачиваем конфиг <a href="https://github.com/poiuty/anilibria/blob/master/conf/nginx_caching_proxy.conf">/etc/nginx/nginx.conf</a>, перезагружаем nginx.
+Скачиваем конфиг <a href="https://raw.githubusercontent.com/icantbelieveitworks/docs/master/lepus/conf/nginx_caching_proxy.conf">/etc/nginx/nginx.conf</a>, перезагружаем nginx.
 ```
-wget https://raw.githubusercontent.com/poiuty/anilibria/master/conf/nginx_caching_proxy.conf -O /etc/nginx/nginx.conf
+wget https://raw.githubusercontent.com/icantbelieveitworks/docs/master/lepus/conf/nginx_caching_proxy.conf -O /etc/nginx/nginx.conf
 /etc/init.d/nginx restart
 ```
 
