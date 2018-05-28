@@ -49,3 +49,31 @@ ffmpeg -y -f x11grab -r 30 -i :0 -c:v libx264 -pix_fmt yuv420p -preset veryfast 
 ```
 
 <img src="https://img.poiuty.com/img/f1/d3bf6d75d8e8b873481a09c7ed0c20f1.png">
+
+<hr/>
+
+Авторизация.
+
+```
+on_publish http://IP/auth.php;
+```
+
+```php
+<?php
+// header("HTTP/1.0 404 Not Found");
+// {"app":"src","flashver":"","swfurl":"","tcurl":"rtmp:\/\/ip:1935\/src","pageurl":"","addr":"ip","clientid":"45","call":"publish","name":"stream","type":"live","hash":"xxx"}
+
+//var_dump($_POST);
+//file_put_contents("/var/www/debug.log", json_encode($_POST));
+
+if($_POST['name'] != 'stream' || $_POST['hash'] != 'secret'){
+	header("HTTP/1.1 401 Unauthorized");
+	die;
+}
+
+echo 'OK'; // auth
+```
+
+```
+ffmpeg -y -f x11grab -r 30 -i :0 -c:v libx264 -pix_fmt yuv420p -preset veryfast -g 60 -f flv rtmp://IP:1935/src/stream?hash=secret
+```
