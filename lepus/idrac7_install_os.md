@@ -7,6 +7,7 @@
 Connect Virtual Media
 ```
 <img src="https://img.poiuty.com/img/46/b6c3d6782e2580b35dce182918401346.png">
+
 ```
 Map CD/ DVD
 ```
