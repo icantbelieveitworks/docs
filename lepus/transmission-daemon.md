@@ -55,7 +55,7 @@ cat <<EOF >/home/torrent/upload.bash
 #!/bin/bash
 cd /home/torrent/tmp
 wget --no-directories --content-disposition --restrict-file-names=nocontrol -e robots=off -A.torrent -r https://www.anilibria.tv/wget_torrents.php
-for f in in /home/torrent/tmp/*.torrent; do
+for f in /home/torrent/tmp/*.torrent; do
    transmission-remote --auth transmission:HuHacOmcass2 -a $f
 done
 rm /home/torrent/tmp/*.torrent
