@@ -47,9 +47,9 @@ location ~ ^/transmission {
 
 <hr/>
 
-Auto upload torrents.
+Auto upload torrents [bash].
 ```bash
-adduser --disabled-login torrent
+mkdir /home/torrent
 mkdir /home/torrent/tmp
 cat <<EOF >/home/torrent/upload.bash
 #!/bin/bash
@@ -61,9 +61,7 @@ done
 rm /home/torrent/tmp/*.torrent
 EOF
 
-chmod 755 /home/torrent/upload.bash
-chown torrent:torrent /home/torrent/tmp
-chown torrent:torrent /home/torrent/upload.bash
+chmod 750 /home/torrent/upload.bash
 
 cat <<EOF >/etc/cron.d/torrent
 SHELL=/bin/sh
@@ -71,7 +69,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 MAILTO=""
 HOME=/
 
-10 15 * * *   root   /root/scripts/video.bash >/dev/null 2>&1
+10 15 */7 * *   root   /home/torrent/upload.bash >/dev/null 2>&1
 EOF
 
 /etc/init.d/crond restart
@@ -79,7 +77,7 @@ EOF
 
 <hr/>
 
-Clean old torrents https://habr.com/post/135874/
+Auto upload and clean old torrents https://habr.com/post/135874/
 
 ```php
 #!/usr/bin/php
@@ -100,11 +98,11 @@ require_once('File/Bittorrent2/Decode.php');
 $torrent = new File_Bittorrent2_Decode;
 $login = 'transmission';
 $passwd = 'HuHacOmcass2';
-$dir = '/var/lib/transmission-daemon/.config/transmission-daemon/torrents';
-$files = array_slice(scandir($dir), 2); 
+$dir = ['/var/lib/transmission-daemon/.config/transmission-daemon/torrents', '/home/torrent/tmp'];
+$files = array_slice(scandir($dir[0]), 2); 
 foreach($files as $v){
-	if(pathinfo("$dir/$v",PATHINFO_EXTENSION) == 'torrent'){
-		$info = $torrent->decodeFile("$dir/$v");
+	if(pathinfo("$dir[0]/$v",PATHINFO_EXTENSION) == 'torrent'){
+		$info = $torrent->decodeFile("$dir[0]/$v");
 		$info_hash = pack('H*',$info["info_hash"]);
 		if(!checkTorrent(urlencode($info_hash))){
 			echo "Try remove $v ...  ";
@@ -117,12 +115,17 @@ foreach($files as $v){
 		}
 	}
 }
-```
 
-```
-# php clean.php 
-Try remove debian-9.5.0-amd64-netinst.iso.5cc919f501b5c315.torrent ...  OK!
-Try remove mini.iso.771eb596772e1c0b.torrent ...  OK!
+// clean https://habr.com/post/135874/
+shell_exec("cd $dir[1] && wget -q --no-directories --content-disposition --restrict-file-names=nocontrol -e robots=off -A.torrent -r https://www.anilibria.tv/tracker/torrents/wget_torrents.php");
+$files = array_slice(scandir($dir[1]), 2); 
+foreach($files as $v){
+	if(pathinfo("$dir[1]/$v",PATHINFO_EXTENSION) == 'torrent'){
+		echo "Upload $v\n";
+		shell_exec("transmission-remote --auth $login:$passwd -a ".escapeshellarg("$dir[1]/$v"));
+	}
+}
+shell_exec("rm /home/torrent/tmp/*.torrent");
 ```
 
 <hr/>
