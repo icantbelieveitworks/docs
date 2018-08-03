@@ -48,7 +48,7 @@ location ~ ^/transmission {
 <hr/>
 
 Auto upload torrents.
-```
+```bash
 adduser --disabled-login torrent
 mkdir /home/torrent/tmp
 cat <<EOF >/home/torrent/upload.bash
@@ -75,6 +75,48 @@ HOME=/
 EOF
 
 /etc/init.d/crond restart
+```
+
+<hr/>
+
+Clean old torrents.
+
+```php
+#!/usr/bin/php
+<?php
+// apt-get install php-cli php-pear && pear install File_Bittorrent2
+// https://pear.php.net/package/File_Bittorrent2
+function checkTorrent($hash){
+	$ctx = stream_context_create(['http'=> ['timeout' => 5 ]]); // timeout 5s
+	$str = file_get_contents('http://anilibria.tv:2710/scrape?info_hash='.$hash, false, $ctx);
+	if (strpos($str, 'filesde5') !== false) {
+		return false;
+	}else{
+		return true;
+	}
+}
+
+require_once('File/Bittorrent2/Decode.php');
+$torrent = new File_Bittorrent2_Decode;
+$login = 'transmission';
+$passwd = 'HuHacOmcass2';
+$dir = '/var/lib/transmission-daemon/.config/transmission-daemon/torrents';
+$files = array_slice(scandir($dir), 2); 
+foreach($files as $v){
+	if(pathinfo("$dir/$v",PATHINFO_EXTENSION) == 'torrent'){
+		$info = $torrent->decodeFile("$dir/$v");
+		$info_hash = pack('H*',$info["info_hash"]);
+		if(!checkTorrent(urlencode($info_hash))){
+			echo "Try remove $v ...  ";
+			$id = intval(shell_exec("transmission-remote --auth $login:$passwd --list | grep ".escapeshellarg($info['name'])." | awk '{print $1}' | sed -e 's/[^0-9]*//g'"));
+			if(is_numeric($id)){
+				echo "OK!";
+				shell_exec("transmission-remote --auth transmission:kleafyeatiacAnEi --torrent $id --remove-and-delete");
+			}
+			echo "\n";
+		}
+	}
+}
 ```
 
 <hr/>
