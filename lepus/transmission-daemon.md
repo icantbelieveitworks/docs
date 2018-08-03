@@ -47,7 +47,7 @@ location ~ ^/transmission {
 
 <hr/>
 
-Auto upload torrents [bash].
+Auto upload torrents.
 ```bash
 mkdir /home/torrent
 mkdir /home/torrent/tmp
