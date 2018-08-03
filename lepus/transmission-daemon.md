@@ -111,7 +111,7 @@ foreach($files as $v){
 			$id = intval(shell_exec("transmission-remote --auth $login:$passwd --list | grep ".escapeshellarg($info['name'])." | awk '{print $1}' | sed -e 's/[^0-9]*//g'"));
 			if(is_numeric($id)){
 				echo "OK!";
-				shell_exec("transmission-remote --auth transmission:kleafyeatiacAnEi --torrent $id --remove-and-delete");
+				shell_exec("transmission-remote --auth $login:$passwd --torrent $id --remove-and-delete");
 			}
 			echo "\n";
 		}
