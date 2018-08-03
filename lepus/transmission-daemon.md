@@ -79,8 +79,7 @@ EOF
 
 <hr/>
 
-Clean old torrents.
-https://habr.com/post/135874/
+Clean old torrents https://habr.com/post/135874/
 
 ```php
 #!/usr/bin/php
@@ -118,6 +117,12 @@ foreach($files as $v){
 		}
 	}
 }
+```
+
+```
+# php clean.php 
+Try remove debian-9.5.0-amd64-netinst.iso.5cc919f501b5c315.torrent ...  OK!
+Try remove mini.iso.771eb596772e1c0b.torrent ...  OK!
 ```
 
 <hr/>
