@@ -126,6 +126,7 @@ foreach($files as $v){
 	if(pathinfo("$dir[1]/$v",PATHINFO_EXTENSION) == 'torrent'){
 		$info = $torrent->decodeFile("$dir[1]/$v");
 		if($bl && in_array($info['info_hash'], $blacklist)){
+			echo "Blacklist {$info['info_hash']} $v\n";
 			continue;
 		}
 		echo "Upload $v\n";
