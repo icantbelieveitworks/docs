@@ -85,7 +85,7 @@ Auto upload and clean old torrents https://habr.com/post/135874/
 // apt-get install php-cli php-pear && pear install File_Bittorrent2
 // https://pear.php.net/package/File_Bittorrent2
 function checkTorrent($hash){
-	$ctx = stream_context_create(['http'=> ['timeout' => 5 ]]); // timeout 5s
+	global $ctx;
 	$str = file_get_contents('http://anilibria.tv:2710/scrape?info_hash='.$hash, false, $ctx);
 	if (strpos($str, 'filesde5') !== false) {
 		return false;
@@ -98,6 +98,7 @@ require_once('File/Bittorrent2/Decode.php');
 $torrent = new File_Bittorrent2_Decode;
 $login = 'transmission';
 $passwd = 'HuHacOmcass2';
+$ctx = stream_context_create(['http'=> ['timeout' => 5 ]]); // timeout 5s for file_get_contents
 $dir = ['/var/lib/transmission-daemon/.config/transmission-daemon/torrents', '/home/torrent/tmp'];
 $files = array_slice(scandir($dir[0]), 2); 
 foreach($files as $v){
@@ -117,10 +118,16 @@ foreach($files as $v){
 }
 
 // clean https://habr.com/post/135874/
+$bl = true; // true - use blacklist, false - dont use.
+$blacklist = explode("\n", file_get_contents('/var/www/anilibria/root/tracker/torrents/blacklist.txt', false, $ctx));
 shell_exec("cd $dir[1] && wget -q --no-directories --content-disposition --restrict-file-names=nocontrol -e robots=off -A.torrent -r https://www.anilibria.tv/tracker/torrents/wget_torrents.php");
 $files = array_slice(scandir($dir[1]), 2); 
 foreach($files as $v){
 	if(pathinfo("$dir[1]/$v",PATHINFO_EXTENSION) == 'torrent'){
+		$info = $torrent->decodeFile("$dir[1]/$v");
+		if($bl && in_array($info['info_hash'], $blacklist)){
+			continue;
+		}
 		echo "Upload $v\n";
 		shell_exec("transmission-remote --auth $login:$passwd -a ".escapeshellarg("$dir[1]/$v"));
 	}
