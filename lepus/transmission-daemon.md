@@ -118,7 +118,7 @@ foreach($files as $v){
 }
 
 // clean https://habr.com/post/135874/
-$bl = true; // true - use blacklist, false - dont use.
+$bl = false; // true - use blacklist, false - dont use.
 $blacklist = explode("\n", file_get_contents('/var/www/anilibria/root/tracker/torrents/blacklist.txt', false, $ctx));
 shell_exec("cd $dir[1] && wget -q --no-directories --content-disposition --restrict-file-names=nocontrol -e robots=off -A.torrent -r https://www.anilibria.tv/tracker/torrents/wget_torrents.php");
 $files = array_slice(scandir($dir[1]), 2); 
