@@ -106,8 +106,8 @@ foreach($files as $v){
 		$info_hash = pack('H*',$info["info_hash"]);
 		if(!checkTorrent(urlencode($info_hash))){
 			echo "Try remove $v ...  ";
-			$id = intval(shell_exec("transmission-remote --auth $login:$passwd --list | grep ".escapeshellarg($info['name'])." | awk '{print $1}' | sed -e 's/[^0-9]*//g'"));
-			if(is_numeric($id)){
+			$id = intval(shell_exec("transmission-remote --auth $login:$passwd -t ".escapeshellarg($info['info_hash'])." --info | grep \"Id:\" | sed -e 's/[^0-9]*//g'"));
+			if(is_numeric($id) && $id != 0){
 				echo "OK!";
 				shell_exec("transmission-remote --auth $login:$passwd --torrent $id --remove-and-delete");
 			}
